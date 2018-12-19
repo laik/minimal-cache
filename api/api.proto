@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
+
+package api;
+
+option go_package = "github.com/laik/minimal-cache/api;api";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+  info: {
+    version: "1.0";
+  };
+  external_docs: {
+    url: "";
+    description: "none";
+  }
+  schemes: HTTPS;
+};
+
+//FSMCommandType describes all available commands that FSM can apply.
+enum FSMCommandType {
+    option (gogoproto.goproto_enum_prefix) = false;
+    APPLY_COMMAND = 0 [(gogoproto.enumvalue_customname) = "FSMApplyCommand"];
+    APPLY_METADATA = 1 [(gogoproto.enumvalue_customname) = "FSMApplyMetadata"];
+}
+
+//FSMCommand is a FSM command.
+message FSMCommand {
+    FSMCommandType type = 1;
+    bytes command = 2 [(gogoproto.customtype) = "github.com/laik/minimal-cache/raw.Raw", (gogoproto.nullable) = false];
+}
+
+//UpdateMetadataRequest is used to update meta info in the raft FSM.
+message UpdateMetadataRequest {
+    string key = 1;
+    string value = 2;
+}
+
+//UpdateMetadataResponse is a response on the UpdateMetadataRequest.
+message UpdateMetadataResponse {}
+
+//ExecuteCommandRequest is a request to execute a command.
+message ExecuteCommandRequest {
+    string command = 1;
+}
+
+//CommandExecutionReply describes all available replies.
+enum CommandExecutionReply {
+    option (gogoproto.goproto_enum_prefix) = false;
+    NIL = 0 [(gogoproto.enumvalue_customname) = "NilCommandReply"];
+    OK = 1 [(gogoproto.enumvalue_customname) = "OkCommandReply"];
+    STRING = 2 [(gogoproto.enumvalue_customname) = "StringCommandReply"];
+    SLICE = 3 [(gogoproto.enumvalue_customname) = "SliceCommandReply"];
+    ERR = 4 [(gogoproto.enumvalue_customname) = "ErrCommandReply"];
+}
+
+//ExecuteCommandResponse is a response on the ExecuteCommandRequest.
+message ExecuteCommandResponse {
+    CommandExecutionReply reply = 1;
+    string item = 2;
+    repeated string items = 3; //slice type
+}
+
+//AddToClusterRequest is a request to add a new raft node to the cluster.
+message AddToClusterRequest {
+    string id = 1;    //node ID
+    string addr = 2; //node raft address
+    // string masterAddress = 3;
+}
+
+//AddToClusterResponse is a reponse on the AddToClusterRequest.
+message AddToClusterResponse {}
+
+
+//Minimal Cache is a service that executes commands.
+service MinimalCache {
+    rpc ExecuteCommand (ExecuteCommandRequest) returns (ExecuteCommandResponse){
+       option (google.api.http) = {
+            post: "/api/v1/exec"
+            body: "*"
+        };
+    };
+    rpc AddToCluster(AddToClusterRequest) returns (AddToClusterResponse){
+        option (google.api.http) = {
+            post: "/api/v1/join"
+            body: "*"
+        };
+    }; //internally using
+}

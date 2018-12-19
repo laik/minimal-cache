@@ -1,0 +1,130 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api.proto",
+    "version": "1.0"
+  },
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/exec": {
+      "post": {
+        "operationId": "ExecuteCommand",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/apiExecuteCommandResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiExecuteCommandRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MinimalCache"
+        ]
+      }
+    },
+    "/api/v1/join": {
+      "post": {
+        "operationId": "AddToCluster",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/apiAddToClusterResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiAddToClusterRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MinimalCache"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "apiAddToClusterRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "addr": {
+          "type": "string"
+        }
+      },
+      "description": "AddToClusterRequest is a request to add a new raft node to the cluster."
+    },
+    "apiAddToClusterResponse": {
+      "type": "object",
+      "description": "AddToClusterResponse is a reponse on the AddToClusterRequest."
+    },
+    "apiCommandExecutionReply": {
+      "type": "string",
+      "enum": [
+        "NIL",
+        "OK",
+        "STRING",
+        "SLICE",
+        "ERR"
+      ],
+      "default": "NIL",
+      "description": "CommandExecutionReply describes all available replies."
+    },
+    "apiExecuteCommandRequest": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string"
+        }
+      },
+      "description": "ExecuteCommandRequest is a request to execute a command."
+    },
+    "apiExecuteCommandResponse": {
+      "type": "object",
+      "properties": {
+        "reply": {
+          "$ref": "#/definitions/apiCommandExecutionReply"
+        },
+        "item": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "ExecuteCommandResponse is a response on the ExecuteCommandRequest."
+    }
+  },
+  "externalDocs": {
+    "description": "none"
+  }
+}
