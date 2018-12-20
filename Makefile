@@ -1,4 +1,4 @@
-all: gen
+all: gen build
 PWD?=$(shell pwd)
 
 gen:
@@ -32,13 +32,13 @@ Mgoogle/protobuf/field_mask.proto=github.com/gogo/protobuf/types:\
 $$GOPATH/src \
 api/*.proto
 
-
 	# Workaround for https://github.com/grpc-ecosystem/grpc-gateway/issues/229.
 	sed -i.bak "s/empty.Empty/types.Empty/g" api/api.pb.gw.go && rm api/api.pb.gw.go.bak
 
 	# Generate static assets for OpenAPI UI
 	statik -m -f -src third_party/OpenAPI/
 
+build:
 	# Building 
 	go build -o bin/minimal-cache-server cmd/server/main.go
 	go build -o bin/minimal-cache-cli cmd/client/main.go

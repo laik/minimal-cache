@@ -65,6 +65,58 @@
           "MinimalCache"
         ]
       }
+    },
+    "/api/v1/member": {
+      "post": {
+        "operationId": "MemberList",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/apiMemberResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiMemeberRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MinimalCache"
+        ]
+      }
+    },
+    "/api/v1/remove": {
+      "post": {
+        "operationId": "RemoveOnCluster",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/apiRemoveClusterResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiRemoveClusterRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MinimalCache"
+        ]
+      }
     }
   },
   "definitions": {
@@ -122,6 +174,64 @@
         }
       },
       "description": "ExecuteCommandResponse is a response on the ExecuteCommandRequest."
+    },
+    "apiMemberResponse": {
+      "type": "object",
+      "properties": {
+        "raftNodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/apiRaftMemberInfo"
+          }
+        }
+      },
+      "description": "MemberResponse is a reponse obtain raft node list."
+    },
+    "apiMemeberRequest": {
+      "type": "object",
+      "description": "MemeberRequest is list all raft node state."
+    },
+    "apiNodeState": {
+      "type": "string",
+      "enum": [
+        "VOTER",
+        "NONVOTER",
+        "STAGING",
+        "SUFFRAGE"
+      ],
+      "default": "VOTER",
+      "description": "NodeState describes member state."
+    },
+    "apiRaftMemberInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "addr": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/apiNodeState"
+        }
+      },
+      "description": "RaftMemberInfo is describe raft node information."
+    },
+    "apiRemoveClusterRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "addr": {
+          "type": "string"
+        }
+      },
+      "description": "RemoveClusterRequest is a request to delete exists raft node on the cluster."
+    },
+    "apiRemoveClusterResponse": {
+      "type": "object",
+      "title": "RemoveClusterResponse is a reponse on the RemoveClusterRequest"
     }
   },
   "externalDocs": {

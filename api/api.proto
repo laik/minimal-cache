@@ -68,12 +68,45 @@ message ExecuteCommandResponse {
 message AddToClusterRequest {
     string id = 1;    //node ID
     string addr = 2; //node raft address
-    // string masterAddress = 3;
 }
+
 
 //AddToClusterResponse is a reponse on the AddToClusterRequest.
 message AddToClusterResponse {}
 
+//RemoveClusterRequest is a request to delete exists raft node on the cluster.
+message RemoveClusterRequest{
+    string id = 1; //node Id
+    string addr = 2; //node raft address
+}
+
+//RemoveClusterResponse is a reponse on the RemoveClusterRequest
+message RemoveClusterResponse {}
+
+
+//MemeberRequest is list all raft node state.
+message MemeberRequest{}
+
+
+//NodeState describes member state.
+enum NodeState {
+    option (gogoproto.goproto_enum_prefix) = false;
+    VOTER = 0 [(gogoproto.enumvalue_customname) = "Voter"];
+    NONVOTER = 1[(gogoproto.enumvalue_customname) = "Nonvoter"];
+    STAGING = 2[(gogoproto.enumvalue_customname) = "Staging"];
+    SUFFRAGE = 3[(gogoproto.enumvalue_customname) = "Suffrage"];
+}
+
+//RaftMemberInfo is describe raft node information.
+message RaftMemberInfo{
+    string id = 1;
+    string addr = 2;
+    NodeState state = 3;
+}
+//MemberResponse is a reponse obtain raft node list.
+message MemberResponse{
+    repeated RaftMemberInfo raftNodes = 1;
+}
 
 //Minimal Cache is a service that executes commands.
 service MinimalCache {
@@ -83,10 +116,25 @@ service MinimalCache {
             body: "*"
         };
     };
+
     rpc AddToCluster(AddToClusterRequest) returns (AddToClusterResponse){
         option (google.api.http) = {
             post: "/api/v1/join"
             body: "*"
         };
     }; //internally using
+
+    rpc RemoveOnCluster(RemoveClusterRequest) returns (RemoveClusterResponse){
+        option (google.api.http) = {
+            post: "/api/v1/remove"
+            body: "*"
+        };
+    }
+
+    rpc MemberList(MemeberRequest) returns (MemberResponse){
+         option (google.api.http) = {
+            post: "/api/v1/member"
+            body: "*"
+        };
+    }
 }

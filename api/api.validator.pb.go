@@ -3,6 +3,7 @@
 
 package api // import "github.com/laik/minimal-cache/api"
 
+import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
@@ -35,5 +36,27 @@ func (this *AddToClusterRequest) Validate() error {
 	return nil
 }
 func (this *AddToClusterResponse) Validate() error {
+	return nil
+}
+func (this *RemoveClusterRequest) Validate() error {
+	return nil
+}
+func (this *RemoveClusterResponse) Validate() error {
+	return nil
+}
+func (this *MemeberRequest) Validate() error {
+	return nil
+}
+func (this *RaftMemberInfo) Validate() error {
+	return nil
+}
+func (this *MemberResponse) Validate() error {
+	for _, item := range this.RaftNodes {
+		if item != nil {
+			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(item); err != nil {
+				return github_com_mwitkow_go_proto_validators.FieldError("RaftNodes", err)
+			}
+		}
+	}
 	return nil
 }

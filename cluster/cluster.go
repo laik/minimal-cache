@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -203,6 +204,57 @@ func (this *RaftNode) AddToCluster(ctx context.Context, req *api.AddToClusterReq
 		return nil, f.Error()
 	}
 	return &api.AddToClusterResponse{}, nil
+}
+
+func (this *RaftNode) RemoveOnCluster(ctx context.Context, req *api.RemoveClusterRequest) (*api.RemoveClusterResponse, error) {
+	if !this.isLeader() {
+		conn, err := this.leaderConn()
+		if err != nil {
+			return nil, err
+		}
+		return api.NewMinimalCacheClient(conn).RemoveOnCluster(ctx, req)
+	}
+
+	configFuture := this.raft.GetConfiguration()
+	if err := configFuture.Error(); err != nil {
+		return nil, fmt.Errorf("failed to get raft configuration: %v", err)
+	}
+
+	for _, srv := range configFuture.Configuration().Servers {
+		if srv.ID == raft.ServerID(req.Id) || srv.Address == raft.ServerAddress(req.Addr) {
+			if srv.Address == raft.ServerAddress(req.Addr) && srv.ID == raft.ServerID(req.Id) {
+				return &api.RemoveClusterResponse{}, nil
+			}
+			future := this.raft.RemoveServer(srv.ID, 0, 0)
+			if err := future.Error(); err != nil {
+				return nil, fmt.Errorf("error removing existing node %s at %s: %s", req.Id, req.Addr, err)
+			}
+		}
+	}
+	return &api.RemoveClusterResponse{}, nil
+}
+
+func (this *RaftNode) MemberList(ctx context.Context, req *api.MemeberRequest) (*api.MemberResponse, error) {
+	memberResponse := &api.MemberResponse{
+		RaftNodes: make([]*api.RaftMemberInfo, 0),
+	}
+	configFuture := this.raft.GetConfiguration()
+	if err := configFuture.Error(); err != nil {
+		return nil, fmt.Errorf("failed to get raft configuration: %v", err)
+	}
+	for _, srv := range configFuture.Configuration().Servers {
+		serverState := srv.Suffrage.String()
+		state := api.NodeState_value[strings.ToUpper(serverState)]
+
+		memberResponse.RaftNodes = append(
+			memberResponse.RaftNodes,
+			&api.RaftMemberInfo{
+				Id:    string(srv.ID),
+				Addr:  string(srv.Address),
+				State: api.NodeState(state),
+			})
+	}
+	return memberResponse, nil
 }
 
 //JoinCluster joins to an existing cluster and runs the server.
