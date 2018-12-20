@@ -221,10 +221,8 @@ func (this *RaftNode) RemoveOnCluster(ctx context.Context, req *api.RemoveCluste
 	}
 
 	for _, srv := range configFuture.Configuration().Servers {
-		if srv.ID == raft.ServerID(req.Id) || srv.Address == raft.ServerAddress(req.Addr) {
-			if srv.Address == raft.ServerAddress(req.Addr) && srv.ID == raft.ServerID(req.Id) {
-				return &api.RemoveClusterResponse{}, nil
-			}
+		if srv.ID == raft.ServerID(req.Id) {
+			this.log.Infof("removing existing node %s at %s", req.Id, req.Addr)
 			future := this.raft.RemoveServer(srv.ID, 0, 0)
 			if err := future.Error(); err != nil {
 				return nil, fmt.Errorf("error removing existing node %s at %s: %s", req.Id, req.Addr, err)

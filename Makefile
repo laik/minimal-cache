@@ -1,4 +1,4 @@
-all: gen build
+all: gen serv cli
 PWD?=$(shell pwd)
 
 gen:
@@ -38,7 +38,9 @@ api/*.proto
 	# Generate static assets for OpenAPI UI
 	statik -m -f -src third_party/OpenAPI/
 
-build:
+serv:
 	# Building 
 	go build -o bin/minimal-cache-server cmd/server/main.go
+
+cli:
 	go build -o bin/minimal-cache-cli cmd/client/main.go

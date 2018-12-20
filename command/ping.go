@@ -16,8 +16,7 @@ func (c *Ping) Name() string {
 
 //Help returns usage of a PING command
 func (c *Ping) Help() string {
-	return `Usage: PING [message]
-Returns PONG if no argument is provided, otherwise return a copy of the argument as a bulk.`
+	return `Usage: PING [message] Returns PONG if no argument is provided, otherwise return a copy of the argument as a bulk.`
 }
 
 //Execute executes a PING command

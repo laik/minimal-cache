@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net"
 	"os"
 
 	cli "github.com/laik/minimal-cache/client"
@@ -16,8 +15,9 @@ var (
 	date    = "20181217"
 )
 
-var host = flag.String("host", "127.0.0.1", "Host to connect to a server")
-var port = flag.String("port", "10001", "Port to connect to a server")
+// var host = flag.String("host", "127.0.0.1", "Host to connect to a server")
+// var port = flag.String("port", "10001", "Port to connect to a server")
+var hosts = flag.String("host", "127.0.0.1:10001", "Host to connect to a server support multipe address, example 127.0.0.1:10001,127.0.0.1:20001")
 var showVersion = flag.Bool("version", false, "Show godown version.")
 
 func main() {
@@ -28,9 +28,9 @@ func main() {
 		os.Exit(0)
 	}
 
-	hostPort := net.JoinHostPort(*host, *port)
+	// hostPort := net.JoinHostPort(hosts)
 
-	if err := cli.Run(hostPort); err != nil {
+	if err := cli.Run(*hosts); err != nil {
 		fmt.Fprintf(os.Stderr, "could not run CLI: %v", err)
 	}
 }
