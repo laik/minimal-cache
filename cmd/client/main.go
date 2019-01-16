@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/laik/minimal-cache/api"
 	cli "github.com/laik/minimal-cache/client"
 )
 
@@ -13,12 +14,14 @@ var (
 	version = "v0.0.1"
 	commit  = "v0.0.1"
 	date    = "20181217"
+	client  api.MinimalCacheClient
 )
 
 // var host = flag.String("host", "127.0.0.1", "Host to connect to a server")
 // var port = flag.String("port", "10001", "Port to connect to a server")
-var hosts = flag.String("host", "127.0.0.1:10001", "Host to connect to a server support multipe address, example 127.0.0.1:10001,127.0.0.1:20001")
-var showVersion = flag.Bool("version", false, "Show godown version.")
+var hosts = flag.String("host", "127.0.0.1:10001", "Host to connect to a server.")
+
+var showVersion = flag.Bool("version", false, "Show minimal version.")
 
 func main() {
 	flag.Parse()

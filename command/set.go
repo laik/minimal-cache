@@ -16,14 +16,12 @@ func (this *Set) Help() string {
 
 //Execute executes the command with the given arguments.
 func (this *Set) Execute(args ...string) Reply {
-	var reply Reply
-
-	reply = checkExpcetArgs(2, args...)
-	if _, ok := reply.(*ErrReply); ok {
-		return reply
+	if len(args) < 2 {
+		return &ErrReply{Message: ErrWrongArgsNumber}
 	}
-	if err := this.stge.Set(args[0], args[1]); err != nil {
-		reply = &ErrReply{Message: err}
+	err := this.stge.Set(args[0], args[1])
+	if err != nil {
+		return &ErrReply{Message: err}
 	}
-	return reply
+	return &OkReply{}
 }

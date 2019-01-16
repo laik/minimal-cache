@@ -1,0 +1,1 @@
+./minimal-cache-server -raft 127.0.0.1:10000 -tcp 127.0.0.1:10001 -http 127.0.0.1:10002 -datadir tmp/node1 -redis 6379
